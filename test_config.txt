@@ -1,0 +1,21 @@
+x: /fred/oz002/tdial/frb_lensing/testing/sig0.15_dm0.1_X.npy
+y: /fred/oz002/tdial/frb_lensing/testing/sig0.15_dm0.1_Y.npy
+dsI: /fred/oz002/tdial/frb_lensing/testing/sig0.15_dm0.1_I.npy
+nFFT: 336
+t: 8
+tN: 20
+delDM: 0.0
+cfreq: 919.5
+bw: 336
+cpus: 32
+rms_w: 5
+rms_g: 1
+stDev: 2
+Wsigma: 2
+wtype: mf
+o: /fred/oz002/tdial/frb_lensing/testing
+n: sig0.15_dm0.1_del0.00001_nFFT336
+DMmin:
+DMmax:
+DMstep: 0.00001
+showplots: True
