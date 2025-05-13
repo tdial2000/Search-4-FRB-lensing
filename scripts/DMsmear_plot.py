@@ -6,11 +6,11 @@ import numpy as np
 def dm_smear(nFFTarr, f):
    return 0.00000297619 * nFFTarr * 1e-3 / (4.14938e3 * (1/(f - 336/nFFTarr)**2 - 1/f**2))
 
-print(dm_smear(336, 663.5))
-print(dm_smear(336, 695.5))
-print(dm_smear(336, 751.5))
-print(dm_smear(336, 1103.5))
-print(dm_smear(336, 1463.5))
+# print(dm_smear(336, 663.5))
+# print(dm_smear(336, 695.5))
+# print(dm_smear(336, 751.5))
+# print(dm_smear(336, 1103.5))
+# print(dm_smear(336, 1463.5))
 
 
 # nFFTarr = [np.arange(1, 32), np.arange(32, 168), np.arange(168, 1024), np.arange(1024, 6720)]

@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 from scipy.signal import correlate
 from scipy.fft import fft, next_fast_len, ifft
 import argparse
-from ilex.data import average, acf
+from utils import average
 from math import ceil
 import sys, warnings, os
 from make_dynspec import make_ds, baseline_correction, flag_chan

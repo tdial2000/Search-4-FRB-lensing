@@ -1,0 +1,21 @@
+x: 
+y: 
+dsI: 
+nFFT: 336
+t: 8
+tN: 20
+delDM: 0.0
+cfreq: 919.5
+bw: 336
+cpus: 32
+rms_w: 5
+rms_g: 1
+stDev: 2
+Wsigma: 2
+wtype: mf
+o: 
+n: 
+DMmin:
+DMmax:
+DMstep: 0.0001
+showplots: True

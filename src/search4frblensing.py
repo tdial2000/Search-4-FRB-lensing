@@ -2,7 +2,7 @@
 # Author:   Tyson Dial                           #
 # Email:    tdial@swin.edu.au                    #
 # Date (created):     20/02/2025                 #
-# Date (updated):     29/04/2025                 #
+# Date (updated):     12/05/2025                 #
 ##################################################
 #                                                #
 #                                                #
@@ -12,9 +12,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.signal import correlate
-from scipy.fft import fft, next_fast_len, ifft
+from scipy.fft import next_fast_len
 import argparse
-from ilex.data import average, acf
+from utils import average
 from math import ceil
 import sys, warnings, os
 from make_dynspec import make_ds, baseline_correction, flag_chan
@@ -28,7 +28,7 @@ ARGTYPES = {'c': str, 'x':str, 'y': str, 'delDM': float, 'cfreq': float, 'bw': f
             'DMmin': float, 'DMmax': float, 'DMstep': float, 'cpus': int, 'rms_w': float, 'rms_g': float, 
             'stDev': int, 'Wsigma': float, 'wtype': str, 'idt': float, 'idf': float, 'tN': int, 'chanflag': str,
             'save_data': bool, 'showplots': bool, 'dsI': str, 'resetdsI': bool, 'o': str, 'n': str, 'noclean': bool,
-            'cfs': bool, 't': float, 'nFFT': int, 'save_config': bool, 'more_plots': bool}
+            'cfs': bool, 't': float, 'nFFT': int, 'save_config': bool, 'more_plots': bool, 'acf_crop': str}
             
 
 class _empty:
@@ -38,6 +38,12 @@ def get_args():
 
     desc = """
     Search for Lensing in FRB voltage data. Requires complex voltage data X and Y.
+    """
+
+    acf_crop_desc = """ Crop used to search for peak in frequency-averaged ACF i.e. acf_crop=5:10,-10:-5 will search for 
+    peak within the ranges -10->-5 milliseconds and 5 to 10 milliseconds, excluding everything else. Must be in accending order if given ranges. can also
+    give single sample values i.e. acf_crop = 5:10, 12 to also include the sample at 12 milliseconds. By default this script will search the entire avaliable 
+    ACF window.
     """
 
     parser = argparse.ArgumentParser(description = desc)
@@ -75,6 +81,7 @@ def get_args():
 
     # cleaning options
     parser.add_argument('--pixel_threshold', help = "Threshold S/N for individual pixels before cleaning", type = float, default = 50.0)
+    parser.add_argument('--acf_crop', help = acf_crop_desc, type = str, default = None)
 
     # plotting paramters, does not affect acf
     parser.add_argument("--save_data", help = "Save data such as acf, X and Y crops etc.", action = "store_true")
@@ -605,40 +612,20 @@ def clean_acf(args, acf, dm, nflagchans):
     I_acf = np.nanmean(cleaned_acf, axis = 0)
     cleaned_acf[:, np.abs(I_acf) == np.inf] = np.nan
 
-    # # clean spourious pixel values
-    # I_acf = np.mean(cleaned_acf[mask], axis = 0)
-    # num_nonnan_samps = I_acf[~np.isnan(I_acf)].size
-
-    rms_mean = np.nanstd(cleaned_acf)
-
-    print(rms_mean)
-
     # remove very bright pixels
+    rms_mean = np.nanstd(cleaned_acf)
     cleaned_acf[cleaned_acf > args.pixel_threshold * rms_mean] = rms_mean
 
+    # Apply the acf_crop (if given) by setting all outside samples to NaN.
+    if (args.acf_crop is not None):
+        if args.acf_crop != "":
+            acf_t = np.linspace(-args.t, args.t, I_acf.size)
+            crop_samples = zap_chan(acf_t, args.acf_crop)   # repurpose zap_chan code (cause i'm LAZY)
+            x_mask = np.ones(acf_t.size, dtype = bool)
+            x_mask[crop_samples] = False
+            cleaned_acf[:, x_mask] = np.nan
 
 
-    # # remove zero lag peak and surrounding samples due to PFB response
-    # cleaned_acf[:, acf.shape[1]//2 - 50 : acf.shape[1]//2 + 51] = np.nan
-
-    # # remove DM smear in acf
-    # ftop = args.cfreq + args.bw/2
-    # fbot = args.cfreq - args.bw/2
-    # dmshift = int(abs(ceil(1.05*4.14938e3 * dm * (1/fbot**2 - 1/ftop**2) / (args.idt * args.nFFT * 1e-3))))
-    # cleaned_acf[:, acf.shape[1]//2 - dmshift : acf.shape[1]//2 + dmshift] = np.nan  
-
-    # # clean near zero time samples
-    # tI_acf = np.nanmean(cleaned_acf, axis = 0)
-
-    # # clean inf
-    # cleaned_acf[:,np.abs(tI_acf) == np.inf] = np.nan
-    # cleaned_acf[cleaned_acf > 1000] = np.nan
-
-    # baseline = np.nanmean(tI_acf)
-
-    # # clean out bad samples with alot of dead channels
-    # num_dead_chans = np.sum(np.isnan(cleaned_acf), axis = 0)
-    # cleaned_acf[:, num_dead_chans > 1.11 * nflagchans] = np.nan
 
 
     return cleaned_acf
