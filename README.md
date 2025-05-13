@@ -1,7 +1,7 @@
 # Searching for FRB lensing
 
 This repo provides the tools nessesary to search for potential lensing in FRB baseband data. The code utilises a channelized ACF algorithm to
-find correlations in the complex voltage data. See this [Guthub Repo Wiki](https://github.com/tdial2000/Search-4-FRB-lensing/wiki).
+find correlations in the complex voltage data. See this [Guthub Repo Wiki](https://github.com/tdial2000/Search-4-FRB-lensing/wiki) for a how to guide!
 
 ## Data Format
 
