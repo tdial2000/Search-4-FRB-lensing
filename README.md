@@ -16,12 +16,3 @@ This code requires python version >=3.9 along with the following packages:
 3. Scipy (For signal processing algorithms including autocorrelation and FFT)
 4. multiprocessing (Enable multi-processing)
 
-
-
-
-## How to use
-
-. To Do
-
-
-##
